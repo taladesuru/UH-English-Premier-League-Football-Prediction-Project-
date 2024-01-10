@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 Import the necessary libraries
 import pandas as pd
@@ -59,6 +58,7 @@ textbox = plt.text(0.1, -0.1, summary_text, transform=fig.transFigure,
                    fontsize=10, fontweight='bold', horizontalalignment='left')
 
 
+plt.show()
 
 # Get the Travel Count from Mumbai to Zurich
 count_mumbai_to_zurich = df1[(df1['City'] == 'Mumbai') & (df1['FavoriteTourismDest_abroad'] == 'Zurich')].shape[0]
@@ -91,6 +91,7 @@ fig = plt.gcf()
 textbox = plt.text(0.1, -0.1, summary_text, transform=fig.transFigure,
                    fontsize=10, fontweight='bold', horizontalalignment='left')
 
+plt.show()
 
 # Getting the Age Range Distribution of Participants
 plt.figure(figsize=(12, 6))
@@ -107,7 +108,7 @@ fig = plt.gcf()
 textbox = plt.text(0.1, -0.1, summary_text, transform=fig.transFigure,
                    fontsize=10, fontweight='bold', horizontalalignment='left')
 
-
+plt.show()
 
 # Setting the figure size
 plt.figure(figsize=(14, 8))
@@ -134,7 +135,7 @@ fig = plt.gcf()
 textbox = plt.text(0.1, -0.1, summary_text, transform=fig.transFigure,
                    fontsize=10, fontweight='bold', horizontalalignment='left')
 
-
+plt.show()
 
 # Get the Count for Favourite Tourism Destination Abroad
 destinations_count = df1['FavoriteTourismDest_abroad'].value_counts()
@@ -173,7 +174,7 @@ fig = plt.gcf()
 textbox = plt.text(0.1, -0.1, summary_text, transform=fig.transFigure,
                    fontsize=10, fontweight='bold', horizontalalignment='left')
 
-
+plt.show()
 
 # Get the Count for Favourite Tourism Destination India
 destinations_india_count = df1['FavoriteTourismDest_india'].value_counts()
@@ -219,6 +220,7 @@ fig = plt.gcf()
 textbox = plt.text(0.1, -0.1, summary_text, transform=fig.transFigure,
                    fontsize=10, fontweight='bold', horizontalalignment='left')
 
+plt.show()
 
 # Assuming df1 is your DataFrame
 plt.figure(figsize=(12, 8))
@@ -250,6 +252,7 @@ fig = plt.gcf()
 textbox = plt.text(0.1, -0.1, summary_text, transform=fig.transFigure,
                    fontsize=10, fontweight='bold', horizontalalignment='left')
 
+plt.show()
 
 
 # Setting the figure size
@@ -283,6 +286,7 @@ fig = plt.gcf()
 textbox = plt.text(0.1, -0.1, summary_text, transform=fig.transFigure,
                    fontsize=10, fontweight='bold', horizontalalignment='left')
 
+plt.show()
 
 # Getting Gender Counts
 gender_counts = df1['Gender'].value_counts()
@@ -388,8 +392,5 @@ textbox = plt.text(0.5, -0.16, summary_text, transform=fig.transFigure,
 
 plt.subplots_adjust(bottom=0.3)
 
-# Save the dashboard as a PNG file
-plt.savefig('22086778.png', dpi=300)
 
-
-
+plt.show()

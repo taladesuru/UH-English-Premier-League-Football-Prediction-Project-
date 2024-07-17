@@ -1,0 +1,80 @@
+#Mount the Google Drive
+from google.colab import drive
+drive.mount('/content/drive')
+#Importing The Libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+#Import and read The dataset
+pl3 = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/2023-2024.csv')
+pl3
+#Display The Summary of Information of the Dataset File
+pl3.info()
+#Data Cleaning
+pl3.isnull().sum()
+#DATA PREPROCESSING
+# Convert the Date column to datetime format with the specified date format
+pl3['Date'] = pd.to_datetime(pl3['Date'], format='%d/%m/%Y')
+pl3
+
+# Create a DataFrame with unique team names
+teams = pl3['HomeTeam'].unique()
+pl3_table = pd.DataFrame({'Team': teams})
+
+# Display the DataFrame
+pl3_table
+
+#Data preprocessing continued to create the needed / relevant columns in the dataframe and the default value created is set to zero
+pl3_table[['Played','Win','Draw','Loss','GF','GA','GD','Points']] = 0
+
+# Check Table
+pl3_table
+
+#FIXING APPROPRIATE POINTS TO THE TABLE CREATED
+
+# Reset the index of pl3_table to make 'Team' a regular column
+pl3_table = pl3_table.reset_index()
+
+# Set 'Team' as the new index
+pl3_table = pl3_table.set_index('Team')
+
+# Iterate over each row in the DataFrame pl3
+for i, row in pl3.iterrows():
+    home = row['HomeTeam']
+    away = row['AwayTeam']
+
+    # Update 'Played' count for home and away teams
+    pl3_table.loc[home, 'Played'] += 1
+    pl3_table.loc[away, 'Played'] += 1
+
+    # Update 'GF' (Goals For) and 'GA' (Goals Against) for home and away teams
+    pl3_table.loc[home, 'GF'] += row['FTHG']
+    pl3_table.loc[away, 'GF'] += row['FTAG']
+    pl3_table.loc[home, 'GA'] += row['FTAG']
+    pl3_table.loc[away, 'GA'] += row['FTHG']
+
+    # Update 'Win', 'Loss', 'Draw' counts based on match result
+    if row['FTR'] == "H":
+        pl3_table.loc[home, 'Win'] += 1
+        pl3_table.loc[away, 'Loss'] += 1
+    elif row['FTR'] == "A":
+        pl3_table.loc[away, 'Win'] += 1
+        pl3_table.loc[home, 'Loss'] += 1
+    else:
+        pl3_table.loc[home, 'Draw'] += 1
+        pl3_table.loc[away, 'Draw'] += 1
+
+# Calculate 'Points' as 3 times 'Win' plus 'Draw'
+pl3_table['Points'] = 3 * pl3_table['Win'] + pl3_table['Draw']
+
+# Calculate 'GD' (Goal Difference) as 'GF' minus 'GA'
+pl3_table['GD'] = pl3_table['GF'] - pl3_table['GA']
+
+# Sort teams by 'Points' in descending order
+pl3_table = pl3_table.sort_values(by='Points', ascending=False)
+
+# Reset the index to have a sequential index
+pl3_table = pl3_table.reset_index()
+
+pl3_table

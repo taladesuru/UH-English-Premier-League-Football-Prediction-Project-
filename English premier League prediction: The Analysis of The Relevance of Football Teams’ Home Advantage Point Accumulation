@@ -1,31 +1,38 @@
 #Mount the Google Drive
 from google.colab import drive
 drive.mount('/content/drive')
+
 #Importing The Libraries
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-#Import and read The dataset
+import warnings
+warnings.filterwarnings('ignore')
+
+#Read The 2023-2024 premier league Dataset csv file into the pl3 DataFrame
 pl3 = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/2023-2024.csv')
 pl3
 #Display The Summary of Information of the Dataset File
 pl3.info()
-#Data Cleaning
+#Display the datatype of the columns of the pl3 DataFrame
+pl3.dtypes
+#Data Cleaning to check for null or missing values
 pl3.isnull().sum()
+
 #DATA PREPROCESSING
 # Convert the Date column to datetime format with the specified date format
 pl3['Date'] = pd.to_datetime(pl3['Date'], format='%d/%m/%Y')
 pl3
 
-# Create a DataFrame with unique team names
+# Create a pl3_table DataFrame with unique team names
 teams = pl3['HomeTeam'].unique()
 pl3_table = pd.DataFrame({'Team': teams})
 
 # Display the DataFrame
 pl3_table
 
-#Data preprocessing continued to create the needed / relevant columns in the dataframe and the default value created is set to zero
+#Initialize relevant columns in the dataframe and the default value created is set to zero
 pl3_table[['Played','Win','Draw','Loss','GF','GA','GD','Points']] = 0
 
 # Check Table

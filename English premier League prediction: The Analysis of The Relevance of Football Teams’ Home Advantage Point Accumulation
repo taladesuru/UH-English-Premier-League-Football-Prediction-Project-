@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
 warnings.filterwarnings('ignore')
+import matplotlib.cm as cm
 
 #Read The 2023-2024 premier league Dataset csv file into the pl3 DataFrame
 pl3 = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/2023-2024.csv')
@@ -85,3 +86,172 @@ pl3_table = pl3_table.sort_values(by='Points', ascending=False)
 pl3_table = pl3_table.reset_index()
 
 pl3_table
+
+# Generate unique colors for each team
+colors = cm.rainbow(np.linspace(0, 1, len(pl3_table.Team)))
+
+plt.figure(figsize=(15, 7))
+
+# Plot bars with unique colors
+for i, league_team in enumerate(pl3_table.Team):
+    plt.bar(league_team, pl3_table.Win[i], color=colors[i], label=league_team)
+
+plt.xlabel('league_team')
+plt.ylabel('Wins')
+plt.xticks(rotation='vertical')
+plt.title('Premier League Win 2023-2024')
+plt.legend()
+plt.show()
+
+# Generate unique colors for each team
+colors = cm.rainbow(np.linspace(0, 1, len(pl3_table.Team)))
+
+plt.figure(figsize=(15, 7))
+
+# Plot bars with unique colors
+for i, league_team in enumerate(pl3_table.Team):
+    plt.bar(league_team, pl3_table.Loss[i], color=colors[i], label=league_team)
+
+plt.xlabel('league_team')
+plt.ylabel('Loss')
+plt.xticks(rotation='vertical')
+plt.title('Premier League Loss 2023-2024')
+plt.legend()
+plt.show()
+
+
+# Generate unique colors for each team
+colors = cm.rainbow(np.linspace(0, 1, len(pl3_table.Team)))
+
+plt.figure(figsize=(15, 7))
+
+# Plot bars with unique colors
+for i, league_team in enumerate(pl3_table.Team):
+    plt.bar(league_team, pl3_table.Draw[i], color=colors[i], label=league_team)
+
+plt.xlabel('league_team')
+plt.ylabel('Draw')
+plt.xticks(rotation='vertical')
+plt.title('Priemier League Draw 2023-2024')
+plt.legend()
+plt.show()
+
+#Display the pl3 Dataframe
+pl3.head()
+
+# Home Total Counts
+pl3.HomeTeam.value_counts()
+
+# Away Total Count
+pl3.AwayTeam.value_counts()
+
+# Checking for Missing Values
+missing_val = pl3.isnull().sum()
+
+# Display Columns with Missing Values
+missing_columns = missing_val[missing_val > 0]
+missing_columns
+
+# Impute missing values for columns with a small number of missing values using the median statistics
+for col in ['BWH', 'BWD', 'BWA', 'P>2.5', 'P<2.5', 'BWCH', 'BWCD', 'BWCA', 'PC>2.5', 'PC<2.5', 'MaxCAHH', 'MaxCAHA']:
+    pl3[col].fillna(pl3[col].median(), inplace=True)
+
+# Drop columns with a large number of missing values
+pl3.drop(columns=['IWH', 'IWD', 'IWA', 'IWCH', 'IWCD', 'IWCA'], inplace=True)
+
+# Select relevant features for analysis
+select_columns = ['Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR', 'HTHG', 'HTAG'] + \
+                   [col for col in pl3.columns if 'B365' in col or 'Max' in col or 'Avg' in col]
+
+select_data = pl3[select_columns]
+
+# Display the first few rows of the preprocessed dataset
+select_data
+
+#EXPLORATORY DATA ANALYSIS
+# Getting the Data Statistics
+data_stats = pl3.describe()
+
+# Display results
+print("Data Statistics:\n", data_stats)
+
+# Aggregate goals scored at Home by each Team
+home_goals_by_team = pl3.groupby('HomeTeam')['FTHG'].sum().reset_index()
+
+# Generate unique colors for each team
+colors = cm.rainbow(np.linspace(0, 1, len(home_goals_by_team)))
+
+# Create a bar chart with unique colors
+plt.figure(figsize=(15, 7))
+for i, team in enumerate(home_goals_by_team['HomeTeam']):
+    plt.bar(team, home_goals_by_team['FTHG'][i], color=colors[i], label=team)
+plt.xticks(rotation=90)
+plt.title('Total Home Goals Scored by Each Team')
+plt.xlabel('Home Team')
+plt.ylabel('Total Home Goals')
+plt.legend()
+plt.show()
+
+# Using Bar chart to Visualize the Full Time Result (FTR)
+plt.figure(figsize=(8, 4))
+sns.countplot(pl3['FTR'], palette='Set2')
+plt.title('Bar Chart of Count of Full Time Result for 2023 - 2024 Season')
+plt.xlabel('Full Time Result for total count of HOME_WIN, AWAY_WIN and DRAW')
+plt.ylabel('Count')
+plt.grid(True)
+plt.show()
+
+pl3_table.head()
+
+pl3_table.head()
+
+# Calculate the correlation matrix
+correlation_matrix = pl3_table[['Played', 'Win', 'Draw', 'Loss', 'GF', 'GA', 'GD', 'Points']].corr()
+
+# Plot the heatmap
+plt.figure(figsize=(10, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
+plt.title('Correlation Matrix')
+plt.show()
+
+correlation_matrix
+
+# Pairplot to visualize relationships
+sns.pairplot(pl3[['FTHG', 'FTAG', 'AvgCAHH', 'AvgCAHA']], palette='Set2')
+plt.show()
+
+#FEATURE ENGINEERING
+# Create new features
+pl3['HomeWin'] = np.where(pl3['FTR'] == 'H', 1, 0)
+pl3['HomeDraw'] = np.where(pl3['FTR'] == 'D', 1, 0)
+pl3['HomeLoss'] = np.where(pl3['FTR'] == 'A', 1, 0)
+pl3['HomePoints'] = np.where(pl3['FTR'] == 'H', 3, np.where(pl3['FTR'] == 'D', 1, 0))
+
+# Aggregate features for each team
+team_stats = pl3.groupby('HomeTeam').agg({
+    'HomeWin': 'sum',
+    'HomeDraw': 'sum',
+    'HomeLoss': 'sum',
+    'HomePoints': 'sum'
+}).reset_index()
+
+print(team_stats)
+
+
+# Create new features
+pl3['HomeWin'] = np.where(pl3['FTR'] == 'H', 1, 0)
+pl3['HomeDraw'] = np.where(pl3['FTR'] == 'D', 1, 0)
+pl3['HomeLoss'] = np.where(pl3['FTR'] == 'A', 1, 0)
+pl3['HomePoints'] = np.where(pl3['FTR'] == 'H', 3, np.where(pl3['FTR'] == 'D', 1, 0))
+
+# Aggregate features for each team
+team_stats = pl3.groupby('HomeTeam').agg({
+    'HomeWin': 'sum',
+    'HomeDraw': 'sum',
+    'HomeLoss': 'sum',
+    'HomePoints': 'sum'
+}).reset_index()
+
+print(team_stats)
+
+

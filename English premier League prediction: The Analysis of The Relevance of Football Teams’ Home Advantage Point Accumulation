@@ -239,19 +239,22 @@ print(team_stats)
 
 
 # Create new features
-pl3['HomeWin'] = np.where(pl3['FTR'] == 'H', 1, 0)
-pl3['HomeDraw'] = np.where(pl3['FTR'] == 'D', 1, 0)
-pl3['HomeLoss'] = np.where(pl3['FTR'] == 'A', 1, 0)
-pl3['HomePoints'] = np.where(pl3['FTR'] == 'H', 3, np.where(pl3['FTR'] == 'D', 1, 0))
+pl3['AwayWin'] = np.where(pl3['FTR'] == 'H', 1, 0)
+pl3['AwayDraw'] = np.where(pl3['FTR'] == 'D', 1, 0)
+pl3['AwayLoss'] = np.where(pl3['FTR'] == 'A', 1, 0)
+pl3['AwayPoints'] = np.where(pl3['FTR'] == 'H', 3, np.where(pl3['FTR'] == 'D', 1, 0))
 
 # Aggregate features for each team
-team_stats = pl3.groupby('HomeTeam').agg({
-    'HomeWin': 'sum',
-    'HomeDraw': 'sum',
-    'HomeLoss': 'sum',
-    'HomePoints': 'sum'
+team_stats_away = pl3.groupby('AwayTeam').agg({
+    'AwayWin': 'sum',
+    'AwayDraw': 'sum',
+    'AwayLoss': 'sum',
+    'AwayPoints': 'sum'
 }).reset_index()
 
-print(team_stats)
+print(team_stats_away)
+
+
+
 
 

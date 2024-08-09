@@ -132,17 +132,17 @@ for i, league_team in enumerate(pl3_table.Team):
 plt.xlabel('league_team')
 plt.ylabel('Draw')
 plt.xticks(rotation='vertical')
-plt.title('Priemier League Draw 2023-2024')
+plt.title('Premier League Draw 2023-2024')
 plt.legend()
 plt.show()
 
 #Display the pl3 Dataframe
 pl3.head()
 
-# Home Total Counts
+# Home Game Total Counts
 pl3.HomeTeam.value_counts()
 
-# Away Total Count
+# Away Game Total Count
 pl3.AwayTeam.value_counts()
 
 # Checking for Missing Values
@@ -165,7 +165,7 @@ select_columns = ['Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR', 'HTHG',
 
 select_data = pl3[select_columns]
 
-# Display the first few rows of the preprocessed dataset
+# Display the first five and last five rows of the preprocessed dataset
 select_data
 
 #EXPLORATORY DATA ANALYSIS
@@ -239,10 +239,10 @@ print(team_stats)
 
 
 # Create new features
-pl3['AwayWin'] = np.where(pl3['FTR'] == 'H', 1, 0)
+pl3['AwayWin'] = np.where(pl3['FTR'] == 'A', 1, 0)
 pl3['AwayDraw'] = np.where(pl3['FTR'] == 'D', 1, 0)
-pl3['AwayLoss'] = np.where(pl3['FTR'] == 'A', 1, 0)
-pl3['AwayPoints'] = np.where(pl3['FTR'] == 'H', 3, np.where(pl3['FTR'] == 'D', 1, 0))
+pl3['AwayLoss'] = np.where(pl3['FTR'] == 'H', 1, 0)
+pl3['AwayPoints'] = np.where(pl3['FTR'] == 'A', 3, np.where(pl3['FTR'] == 'D', 1, 0))
 
 # Aggregate features for each team
 team_stats_away = pl3.groupby('AwayTeam').agg({
@@ -254,6 +254,65 @@ team_stats_away = pl3.groupby('AwayTeam').agg({
 
 print(team_stats_away)
 
+# Visualize Home Wins and Points
+plt.figure(figsize=(12, 6))
+
+plt.subplot(1, 2, 1)
+sns.barplot(x='HomeTeam', y='HomeWin', data=team_stats)
+plt.xticks(rotation=90)
+plt.title('Number of Home Wins by Team')
+print('\n')
+
+plt.subplot(1, 2, 2)
+sns.barplot(x='HomeTeam', y='HomePoints', data=team_stats)
+plt.xticks(rotation=90)
+plt.title('Home Game Points by Team')
+
+plt.tight_layout()
+plt.show()
+
+# Create new features for Home Game Points
+pl3['HomePoints'] = np.where(pl3['FTR'] == 'H', 3, np.where(pl3['FTR'] == 'D', 1, 0))
+
+# Aggregate Home Game Points for each team
+home_points = pl3.groupby('HomeTeam').agg({'HomePoints': 'sum'}).reset_index()
+home_points.rename(columns={'HomeTeam': 'Team'}, inplace=True)
+
+# Put the HomePoint in an Descending Order
+home_points = home_points.sort_values(by='HomePoints', ascending=False)
+
+print(home_points)
+
+#Building model and analysis
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
+
+from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+
+#Define DATA objectives
+# Select Features using Goals and Odds
+features = ['FTHG', 'FTAG', 'AvgCAHH', 'AvgCAHA', 'AvgC>2.5', 'AvgC<2.5']
+target = 'FTR'
+
+# Encode Target Variable
+pl3[target] = pl3[target].map({'H': 0, 'D': 1, 'A': 2})  # Here indictates - Home Win: 0, Draw: 1, Away Win: 2
+
+# Splitting Data into Training and Testing sets
+X = pl3[features]
+y = pl3[target]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Standardize Features
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
 
 
